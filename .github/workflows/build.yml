@@ -9,11 +9,9 @@ jobs:
   core-linux:
     name: Core engine tests (Linux)
     runs-on: ubuntu-latest
+    container: swift:6.1
     steps:
       - uses: actions/checkout@v4
-      - uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: "6.1"
       - run: swift test
 
   mac-app:

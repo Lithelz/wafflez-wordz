@@ -76,6 +76,13 @@ public struct AIEdit: Hashable, Codable, Sendable, Identifiable {
     public var replacement: String
     public var category: IssueCategory
     public var explanation: String
+
+    public init(original: String, replacement: String, category: IssueCategory, explanation: String) {
+        self.original = original
+        self.replacement = replacement
+        self.category = category
+        self.explanation = explanation
+    }
 }
 
 public struct ExpertTip: Hashable, Codable, Sendable, Identifiable {
