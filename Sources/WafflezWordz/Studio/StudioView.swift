@@ -326,45 +326,44 @@ struct EditorScreen: View {
     }
 
     private var toolbar: some View {
-        HStack(spacing: 10) {
-            Button { withAnimation { showList.toggle() } } label: { Image(systemName: "sidebar.squares.left") }
-                .buttonStyle(.plain).foregroundStyle(showList ? Theme.syrup : Theme.textSecondary)
-                .help(showList ? "Hide the document list" : "Show the document list")
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 10) {
+                Button { withAnimation { showList.toggle() } } label: { Image(systemName: "sidebar.squares.left") }
+                    .buttonStyle(.plain).foregroundStyle(showList ? Theme.syrup : Theme.textSecondary)
+                    .help(showList ? "Hide the document list" : "Show the document list")
+                Text("\(controller.result.stats.words) words · \(controller.result.stats.readingTimeSeconds / 60 + 1) min read")
+                    .font(.system(size: 11.5)).foregroundStyle(Theme.textTertiary).lineLimit(1)
+                if controller.slashWorking { ProgressView().controlSize(.small) }
+                Spacer(minLength: 4)
+                Button { showGoals.toggle() } label: { Image(systemName: "target") }
+                    .buttonStyle(GhostButtonStyle())
+                    .help("Goals: audience, formality, domain and intent")
+                    .popover(isPresented: $showGoals) { GoalsView(goals: $controller.goals).padding(16).frame(width: 320) }
+                Button {
+                    if controller.ledger.isRecording { controller.showAuthorship.toggle() } else { controller.startAuthorship() }
+                } label: {
+                    Image(systemName: "touchid").foregroundStyle(controller.ledger.isRecording ? Theme.success : Theme.textSecondary)
+                }
+                .buttonStyle(GhostButtonStyle())
+                .help(controller.ledger.isRecording ? "Authorship is on. Click to color text by origin." : "Turn on Authorship")
+                Menu {
+                    Section("Slash commands — type on a new line, then Return") {
+                        ForEach(EditorController.slashCommands.map { "\($0.0)  —  \($0.1)" }, id: \.self) { Text($0) }
+                    }
+                    Divider()
+                    Button("Copy all text") { copyToClipboard(controller.text) }
+                    Button("Export as Rich Text…") { exportRTF() }
+                } label: { Image(systemName: "ellipsis.circle") }
+                    .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+                Button { withAnimation { showInspector.toggle() } } label: { Image(systemName: "sidebar.right") }
+                    .buttonStyle(GhostButtonStyle())
+            }
             TextField("Title", text: $controller.title)
                 .textFieldStyle(.plain)
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(Theme.text)
-                .frame(minWidth: 120, maxWidth: .infinity)
-                .layoutPriority(1)
-            ViewThatFits {
-                Text("\(controller.result.stats.words) words").font(.system(size: 11.5)).foregroundStyle(Theme.textTertiary).fixedSize()
-                EmptyView()
-            }
-            if controller.slashWorking { ProgressView().controlSize(.small) }
-            Button { showGoals.toggle() } label: { Image(systemName: "target") }
-                .buttonStyle(GhostButtonStyle())
-                .help("Goals: audience, formality, domain and intent")
-                .popover(isPresented: $showGoals) { GoalsView(goals: $controller.goals).padding(16).frame(width: 320) }
-            Button {
-                if controller.ledger.isRecording { controller.showAuthorship.toggle() } else { controller.startAuthorship() }
-            } label: {
-                Image(systemName: "touchid").foregroundStyle(controller.ledger.isRecording ? Theme.success : Theme.textSecondary)
-            }
-            .buttonStyle(GhostButtonStyle())
-            .help(controller.ledger.isRecording ? "Authorship is on. Click to color text by origin." : "Turn on Authorship")
-            Menu {
-                Section("Slash commands — type on a new line, then Return") {
-                    ForEach(EditorController.slashCommands.map { "\($0.0)  —  \($0.1)" }, id: \.self) { Text($0) }
-                }
-                Divider()
-                Button("Copy all text") { copyToClipboard(controller.text) }
-                Button("Export as Rich Text…") { exportRTF() }
-            } label: { Image(systemName: "ellipsis.circle") }
-                .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
-            Button { withAnimation { showInspector.toggle() } } label: { Image(systemName: "sidebar.right") }
-                .buttonStyle(GhostButtonStyle())
         }
-        .padding(.horizontal, 22).padding(.top, 34).padding(.bottom, 10)
+        .padding(.horizontal, 22).padding(.top, 34).padding(.bottom, 8)
         .background(Theme.midnight)
     }
 

@@ -96,8 +96,9 @@ final class EverywhereController: ObservableObject {
         if trusted != state.accessibilityTrusted { state.accessibilityTrusted = trusted }
         guard trusted else { detach(); return }
         guard let front = NSWorkspace.shared.frontmostApplication else { return }
-        // When one of our own panels is active, keep everything as it is.
-        if front.processIdentifier == ProcessInfo.processInfo.processIdentifier { return }
+        // When one of our own panels is active or has keyboard focus, keep everything as it is.
+        let mine = ProcessInfo.processInfo.processIdentifier
+        if front.processIdentifier == mine || NSApp.keyWindow != nil { return }
         if state.isBlocked(front.bundleIdentifier) { detach(); return }
 
         if !webEnabledPIDs.contains(front.processIdentifier) {
@@ -105,6 +106,7 @@ final class EverywhereController: ObservableObject {
             AX.enableWebAccessibility(pid: front.processIdentifier, bundleID: front.bundleIdentifier)
         }
 
+        if let focused = AX.focusedElement(), AX.pid(focused) == mine { return }
         guard let el = AX.focusedElement(), AX.isEditableText(el) else {
             if !isMouseOverPanels() { detach() }
             return
