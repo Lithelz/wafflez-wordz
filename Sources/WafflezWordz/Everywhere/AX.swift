@@ -52,7 +52,8 @@ enum AX {
     static func axValue<T>(_ el: AXUIElement, _ name: String, _ type: AXValueType, _ initial: T) -> T? {
         guard let v = raw(el, name), CFGetTypeID(v) == AXValueGetTypeID() else { return nil }
         var out = initial
-        return AXValueGetValue(v as! AXValue, type, &out) ? out : nil
+        let ok = withUnsafeMutablePointer(to: &out) { AXValueGetValue(v as! AXValue, type, UnsafeMutableRawPointer($0)) }
+        return ok ? out : nil
     }
 
     static func focusedElement() -> AXUIElement? {

@@ -28,6 +28,27 @@ jobs:
         run: swift test
       - name: Build app
         run: ./scripts/build_app.sh
+      - name: Smoke test (launch the app and take screenshots)
+        run: |
+          BIN="build/Wafflez Wordz.app/Contents/MacOS/WafflezWordz"
+          mkdir -p shots
+          "$BIN" & PID=$!
+          sleep 10
+          kill -0 $PID && echo "✓ App launched and is still running"
+          screencapture -x shots/01-first-launch.png || true
+          kill $PID; sleep 2
+          for s in documents agents humanizer detector plagiarism chat insights settings; do
+            "$BIN" --no-welcome --section $s & PID=$!
+            sleep 7
+            kill -0 $PID && echo "✓ $s screen is running"
+            screencapture -x "shots/$s.png" || true
+            kill $PID; sleep 2
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: shots
       - name: Zip app
         run: cd build && ditto -c -k --keepParent "Wafflez Wordz.app" "Wafflez-Wordz.zip"
       - uses: actions/upload-artifact@v4

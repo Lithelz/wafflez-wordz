@@ -6,11 +6,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         MainActor.assumeIsolated {
             NSApp.appearance = NSAppearance(named: .darkAqua)
             NSApp.setActivationPolicy(.accessory)
-            if !AX.isTrusted { AX.requestTrust() }
+            // Launch arguments used by the CI smoke test: --section <name> opens that Studio screen, --no-welcome skips the intro.
+            let args = CommandLine.arguments
+            let section = args.firstIndex(of: "--section").flatMap { i in i + 1 < args.count ? StudioSection(rawValue: args[i + 1]) : nil }
+            if args.contains("--no-welcome") { AppState.shared.settings.hasSeenWelcome = true }
+            if !AX.isTrusted && section == nil { AX.requestTrust() }
             EverywhereController.shared.start()
             AppDelegate.registerHotKeys()
-            // First launch (or no window yet): open the Studio so people see what Wafflez does.
-            if !AppState.shared.settings.hasSeenWelcome {
+            // First launch: open the Studio so people see what Wafflez does.
+            if let section {
+                StudioWindow.shared.show(section: section)
+            } else if !AppState.shared.settings.hasSeenWelcome {
                 StudioWindow.shared.show(section: .documents)
             }
         }
