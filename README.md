@@ -20,19 +20,46 @@ All checking runs on your Mac. AI features use Claude with **your own API key**,
 
 ---
 
-## Build and run
+## Install
 
-You need macOS 14 (Sonoma) or newer and Xcode 16 or newer (or the Command Line Tools).
+### Option 1: download the ready-built app
+
+1. Open the repo's **Releases → latest** page (right side of the repo's main page) and download **Wafflez-Wordz.zip**.
+2. Open **Terminal** (⌘Space, type `Terminal`, press Return), then paste these lines one at a time:
 
 ```bash
-git clone <this repo>
-cd wafflez-wordz
+cd ~/Downloads && [ -d "Wafflez Wordz.app" ] || unzip -oq Wafflez-Wordz.zip
+```
+
+```bash
+rm -rf "/Applications/Wafflez Wordz.app" && mv ~/Downloads/"Wafflez Wordz.app" /Applications/
+```
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Wafflez Wordz.app"
+```
+
+```bash
+open "/Applications/Wafflez Wordz.app"
+```
+
+The `xattr` line tells macOS you trust the app. It isn't notarized by Apple, so without that line macOS refuses to open it.
+
+### Option 2: build it from source
+
+You need macOS 14 (Sonoma) or newer and Apple's free developer tools:
+
+```bash
+xcode-select --install
+```
+
+Then, from the project folder:
+
+```bash
 ./scripts/build_app.sh --install
 ```
 
-That builds `build/Wafflez Wordz.app`, copies it to `/Applications` and opens it. You can also download a ready-built app from the latest **Actions → Build** run (the `Wafflez-Wordz-app` artifact).
-
-**Opening a downloaded build:** the app is signed ad hoc, not notarized. The first time, right-click it and choose **Open**, or allow it in **System Settings → Privacy & Security**.
+That builds the app, copies it to `/Applications` and opens it.
 
 ### First launch
 
