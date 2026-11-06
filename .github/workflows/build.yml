@@ -49,6 +49,16 @@ jobs:
         with:
           name: screenshots
           path: shots
+      - name: Print screenshots (base64, for remote review)
+        if: always()
+        run: |
+          for f in shots/*.png; do
+            [ -f "$f" ] || continue
+            sips -Z 1300 -s format jpeg -s formatOptions 62 "$f" --out "${f%.png}.jpg" >/dev/null
+            echo "=====BEGIN $(basename "${f%.png}")====="
+            base64 -i "${f%.png}.jpg" | fold -w 1000
+            echo "=====END====="
+          done
       - name: Zip app
         run: cd build && ditto -c -k --keepParent "Wafflez Wordz.app" "Wafflez-Wordz.zip"
       - uses: actions/upload-artifact@v4
