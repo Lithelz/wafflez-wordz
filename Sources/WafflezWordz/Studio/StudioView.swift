@@ -181,7 +181,7 @@ struct DocumentsScreen: View {
     @ObservedObject var nav: StudioNavigation
     @ObservedObject var state = AppState.shared
     @State private var query = ""
-    @AppStorage("wz.showDocList") private var showList = true
+    @AppStorage("wz.showDocList") private var showList = false
 
     var filtered: [WDocument] {
         let q = query.lowercased().trimmed
@@ -191,7 +191,7 @@ struct DocumentsScreen: View {
 
     var body: some View {
         HSplitView {
-            if showList {
+            if showList || nav.documentID == nil {
             VStack(spacing: 0) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass").foregroundStyle(Theme.textTertiary)
@@ -293,7 +293,7 @@ struct EditorScreen: View {
     @State private var selectionResult: String?
     @State private var selectionWorking = false
     @State private var selectionError: String?
-    @AppStorage("wz.showDocList") private var showList = true
+    @AppStorage("wz.showDocList") private var showList = false
 
     enum InspectorTab: String, CaseIterable, Identifiable {
         case review = "Review", agents = "Agents", chat = "Chat", stats = "Stats"

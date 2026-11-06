@@ -280,9 +280,11 @@ public final class TextAnalyzer: @unchecked Sendable {
     /// 0–100. Starts at 100 and loses points per issue, scaled to text length.
     public static func score(suggestions: [Suggestion], stats: TextStats) -> Int {
         guard stats.words > 0 else { return 100 }
-        let penalty = suggestions.reduce(0.0) { $0 + $1.category.scoreWeight }
-        let per100 = penalty / max(1, Double(stats.words)) * 100
-        var score = 100 - per100 * 1.6
+        let penalty = suggestions.filter { $0.ruleID != "long-sentence" }.reduce(0.0) { $0 + $1.category.scoreWeight }
+            + Double(suggestions.filter { $0.ruleID == "long-sentence" }.count) * 1.5
+        // Short messages are measured as if they were 80 words long, so one slip doesn't sink the score.
+        let per100 = penalty / max(80, Double(stats.words)) * 100
+        var score = 100 - per100 * 1.2
         if stats.fleschReadingEase < 30 { score -= 4 }
         return Int(min(100, max(0, score)).rounded())
     }

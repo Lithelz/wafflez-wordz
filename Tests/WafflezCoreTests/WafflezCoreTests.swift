@@ -157,6 +157,8 @@ final class RuleTests: XCTestCase {
         XCTAssertEqual(r.stats.words, 8)
         XCTAssertEqual(r.stats.sentences, 2)
         XCTAssertGreaterThan(r.score, 80)
+        let messy = analyzer.analyze("I just wanted to say that its a very good idea to meet in order to plan the the launch. Me and him went to the office.", config: AnalyzerConfig())
+        XCTAssertTrue((30...85).contains(messy.score), "score \(messy.score)")
     }
 }
 
