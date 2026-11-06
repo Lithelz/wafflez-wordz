@@ -17,6 +17,8 @@ jobs:
   mac-app:
     name: Mac app (macOS)
     runs-on: macos-15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Show toolchain
@@ -78,3 +80,13 @@ jobs:
         with:
           name: Wafflez-Wordz-app
           path: build/Wafflez-Wordz.zip
+      - name: Publish the app as the "latest" release
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest "build/Wafflez-Wordz.zip" \
+            --title "Wafflez Wordz — latest build" \
+            --target "$GITHUB_SHA" \
+            --notes "Download **Wafflez-Wordz.zip** below, unzip it, and move **Wafflez Wordz.app** to Applications. See the README for the copy-paste install commands."
