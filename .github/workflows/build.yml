@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core-linux:
+    name: Core engine tests (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.1"
+      - run: swift test
+
+  mac-app:
+    name: Mac app (macOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+      - name: Test core
+        run: swift test
+      - name: Build app
+        run: ./scripts/build_app.sh
+      - name: Zip app
+        run: cd build && ditto -c -k --keepParent "Wafflez Wordz.app" "Wafflez-Wordz.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Wafflez-Wordz-app
+          path: build/Wafflez-Wordz.zip
