@@ -13,6 +13,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if !AX.isTrusted && section == nil { AX.requestTrust() }
             EverywhereController.shared.start()
             AppDelegate.registerHotKeys()
+            if args.contains("--everywhere-test") {
+                // CI check: report what Wafflez sees in the frontmost app.
+                for delay in [6.0, 8.0] {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                        let e = EverywhereController.shared
+                        let rules = e.suggestions.map(\.ruleID).joined(separator: ",")
+                        print("EVERYWHERE trusted=\(AX.isTrusted) app=\(e.appName) attached=\(e.element != nil) suggestions=\(e.suggestions.count) [\(rules)] tone=\(e.tone?.summary ?? "-")")
+                        fflush(stdout)
+                    }
+                }
+            }
             // First launch: open the Studio so people see what Wafflez does.
             if let section {
                 StudioWindow.shared.show(section: section)

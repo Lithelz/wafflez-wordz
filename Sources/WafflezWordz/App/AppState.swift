@@ -44,7 +44,7 @@ struct AppSettings: Codable, Equatable {
     var goals = WritingGoals()
     var disabledRules: Set<String> = []
     var disabledCategories: Set<IssueCategory> = []
-    var personalDictionary: [String] = []
+    var personalDictionary: [String] = ["Wafflez", "Wordz"]
     var styleRules: [StyleRule] = [
         StyleRule(term: "e-mail", replacement: "email", note: "Write \"email\" without a hyphen."),
         StyleRule(term: "Wafflez Words", replacement: "Wafflez Wordz", note: "Our product name ends in a z.", caseSensitive: true),

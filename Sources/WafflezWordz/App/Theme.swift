@@ -131,6 +131,8 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 13, weight: .semibold))
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 14).padding(.vertical, 7)
             .foregroundStyle(Color(hex: "#2A1A05"))
             .background(Theme.accentGradient, in: Capsule())
@@ -143,6 +145,8 @@ struct GhostButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 12.5, weight: .medium))
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 11).padding(.vertical, 6)
             .foregroundStyle(tint)
             .background(Theme.raised.opacity(configuration.isPressed ? 1 : 0.7), in: Capsule())
@@ -155,6 +159,8 @@ struct ChipButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 12, weight: .medium))
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 10).padding(.vertical, 5)
             .foregroundStyle(selected ? Color(hex: "#2A1A05") : Theme.text)
             .background(selected ? AnyShapeStyle(Theme.accentGradient) : AnyShapeStyle(Theme.raised.opacity(configuration.isPressed ? 1 : 0.6)), in: Capsule())

@@ -37,6 +37,17 @@ jobs:
           kill -0 $PID && echo "✓ App launched and is still running"
           screencapture -x shots/01-first-launch.png || true
           kill $PID; sleep 2
+          # Wafflez in another app: open TextEdit with sample text and look for underlines + widget.
+          printf 'Hi team,\n\nI just wanted to say that its a very good idea to meet in order to plan the the launch. Me and him went to the office yesterday, and the report was written by Sam. Thanks guys!\n' > /tmp/sample.txt
+          open -a TextEdit /tmp/sample.txt
+          sleep 4
+          "$BIN" --no-welcome --everywhere-test & PID=$!
+          sleep 3
+          osascript -e 'tell application "TextEdit" to activate' || true
+          sleep 6
+          screencapture -x shots/02-textedit.png || true
+          kill $PID; sleep 1
+          osascript -e 'tell application "TextEdit" to quit saving no' || true
           for s in documents agents humanizer detector plagiarism chat insights settings; do
             "$BIN" --no-welcome --section $s & PID=$!
             sleep 7

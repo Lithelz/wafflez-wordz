@@ -62,7 +62,7 @@ final class StudioWindow: NSObject, NSWindowDelegate {
     func show(section: StudioSection? = nil) {
         if let section { nav.section = section }
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1240, height: 800),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1320, height: 840),
                              styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                              backing: .buffered, defer: false)
             w.title = "Wafflez Studio"
@@ -181,6 +181,7 @@ struct DocumentsScreen: View {
     @ObservedObject var nav: StudioNavigation
     @ObservedObject var state = AppState.shared
     @State private var query = ""
+    @AppStorage("wz.showDocList") private var showList = true
 
     var filtered: [WDocument] {
         let q = query.lowercased().trimmed
@@ -190,6 +191,7 @@ struct DocumentsScreen: View {
 
     var body: some View {
         HSplitView {
+            if showList {
             VStack(spacing: 0) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass").foregroundStyle(Theme.textTertiary)
@@ -234,12 +236,19 @@ struct DocumentsScreen: View {
                 .listStyle(.inset)
                 .scrollContentBackground(.hidden)
             }
-            .frame(minWidth: 220, idealWidth: 250, maxWidth: 320)
+            .frame(minWidth: 200, idealWidth: 230, maxWidth: 300)
             .background(Theme.surface.opacity(0.6))
+            }
 
             Group {
                 if let id = nav.documentID, let doc = state.documents.first(where: { $0.id == id }) {
                     EditorScreen(doc: doc).id(doc.id)
+                        .overlay(alignment: .topLeading) {
+                            Button { withAnimation { showList.toggle() } } label: { Image(systemName: showList ? "sidebar.squares.left" : "list.bullet.rectangle") }
+                                .buttonStyle(.plain).foregroundStyle(Theme.textSecondary)
+                                .help(showList ? "Hide the document list" : "Show the document list")
+                                .padding(.leading, 8).padding(.top, 8)
+                        }
                 } else {
                     VStack(spacing: 14) {
                         WaffleMark(size: 54)
@@ -249,7 +258,7 @@ struct DocumentsScreen: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .frame(minWidth: 560)
+            .frame(minWidth: 520)
         }
         .onAppear { if nav.documentID == nil { nav.documentID = state.documents.first?.id } }
     }
@@ -315,7 +324,7 @@ struct EditorScreen: View {
             }
             if showInspector {
                 Divider().overlay(Theme.stroke)
-                inspector.frame(width: 360)
+                inspector.frame(width: 330)
             }
         }
         .onDisappear { controller.persist(); controller.hideCard() }
@@ -327,11 +336,16 @@ struct EditorScreen: View {
                 .textFieldStyle(.plain)
                 .font(.system(size: 20, weight: .bold))
                 .foregroundStyle(Theme.text)
-            Spacer()
-            Text("\(controller.result.stats.words) words").font(.system(size: 11.5)).foregroundStyle(Theme.textTertiary)
+                .frame(minWidth: 120, maxWidth: .infinity)
+                .layoutPriority(1)
+            ViewThatFits {
+                Text("\(controller.result.stats.words) words").font(.system(size: 11.5)).foregroundStyle(Theme.textTertiary).fixedSize()
+                EmptyView()
+            }
             if controller.slashWorking { ProgressView().controlSize(.small) }
-            Button { showGoals.toggle() } label: { Label("Goals", systemImage: "target") }
+            Button { showGoals.toggle() } label: { Image(systemName: "target") }
                 .buttonStyle(GhostButtonStyle())
+                .help("Goals: audience, formality, domain and intent")
                 .popover(isPresented: $showGoals) { GoalsView(goals: $controller.goals).padding(16).frame(width: 320) }
             Button {
                 if controller.ledger.isRecording { controller.showAuthorship.toggle() } else { controller.startAuthorship() }
