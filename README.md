@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/icon.png" width="128" alt="Wafflez Wordz icon"></p>
+
 # 🧇 Wafflez Wordz
 
 A writing assistant for your Mac, with a midnight theme that matches macOS dark mode. It checks your writing in other apps' text boxes, and comes with **Wafflez Studio**, its own window for AI writing, the AI Humanizer, the AI Detector and the plagiarism checker.
@@ -7,6 +9,14 @@ A writing assistant for your Mac, with a midnight theme that matches macOS dark 
 - **Studio:** a full editor with live checking, an agents panel, AI chat, Authorship, Insights and team tools.
 
 All checking runs on your Mac. AI features use Claude with **your own API key**, which is stored in the macOS Keychain. No key is in this repo.
+
+| In any app (TextEdit shown) | Side panel |
+| --- | --- |
+| ![Underlines, widget and a suggestion card in TextEdit](docs/screenshots/everywhere-card.jpg) | ![Side panel listing suggestions](docs/screenshots/side-panel.jpg) |
+| **Wafflez Studio** | **Agents** |
+| ![Studio editor with live suggestions](docs/screenshots/studio-editor.jpg) | ![Agents grid](docs/screenshots/agents.jpg) |
+
+*These screenshots come from the CI smoke test. On every push, GitHub Actions builds the app on macOS 15, launches it, opens TextEdit with sample text, checks that Wafflez attaches and finds suggestions, and takes these screenshots.*
 
 ---
 
