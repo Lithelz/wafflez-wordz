@@ -37,7 +37,7 @@ final class FloatingPanel: NSPanel {
 @MainActor
 final class PanelHost<Content: View> {
     let panel: FloatingPanel
-    private var hosting: NSHostingView<AnyView>?
+    private var hosting: ClickThroughHostingView<AnyView>?
     /// Which corner stays put when the content grows.
     var anchorTop = true
 
@@ -57,7 +57,7 @@ final class PanelHost<Content: View> {
         if let hosting {
             hosting.rootView = root
         } else {
-            let h = NSHostingView(rootView: root)
+            let h = ClickThroughHostingView(rootView: root)
             h.translatesAutoresizingMaskIntoConstraints = true
             panel.contentView = h
             hosting = h
@@ -94,4 +94,9 @@ final class PanelHost<Content: View> {
         if f.maxY > visible.maxY - 6 { f.origin.y = visible.maxY - f.height - 6 }
         return f
     }
+}
+
+/// Hosting view that takes the first click, so buttons work in panels that never become key.
+final class ClickThroughHostingView<V: View>: NSHostingView<V> {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
