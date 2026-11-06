@@ -243,12 +243,6 @@ struct DocumentsScreen: View {
             Group {
                 if let id = nav.documentID, let doc = state.documents.first(where: { $0.id == id }) {
                     EditorScreen(doc: doc).id(doc.id)
-                        .overlay(alignment: .topLeading) {
-                            Button { withAnimation { showList.toggle() } } label: { Image(systemName: showList ? "sidebar.squares.left" : "list.bullet.rectangle") }
-                                .buttonStyle(.plain).foregroundStyle(Theme.textSecondary)
-                                .help(showList ? "Hide the document list" : "Show the document list")
-                                .padding(.leading, 8).padding(.top, 8)
-                        }
                 } else {
                     VStack(spacing: 14) {
                         WaffleMark(size: 54)
@@ -299,6 +293,7 @@ struct EditorScreen: View {
     @State private var selectionResult: String?
     @State private var selectionWorking = false
     @State private var selectionError: String?
+    @AppStorage("wz.showDocList") private var showList = true
 
     enum InspectorTab: String, CaseIterable, Identifiable {
         case review = "Review", agents = "Agents", chat = "Chat", stats = "Stats"
@@ -317,7 +312,7 @@ struct EditorScreen: View {
             VStack(spacing: 0) {
                 toolbar
                 if let url = controller.citationOffer { citationBanner(url) }
-                CheckedTextEditor(controller: controller)
+                CheckedTextEditor(controller: controller, inset: NSSize(width: 30, height: 24))
                 if !controller.selectedText.trimmed.isEmpty && controller.selectedText.split(separator: " ").count >= 2 {
                     selectionBar
                 }
@@ -332,6 +327,9 @@ struct EditorScreen: View {
 
     private var toolbar: some View {
         HStack(spacing: 10) {
+            Button { withAnimation { showList.toggle() } } label: { Image(systemName: "sidebar.squares.left") }
+                .buttonStyle(.plain).foregroundStyle(showList ? Theme.syrup : Theme.textSecondary)
+                .help(showList ? "Hide the document list" : "Show the document list")
             TextField("Title", text: $controller.title)
                 .textFieldStyle(.plain)
                 .font(.system(size: 20, weight: .bold))

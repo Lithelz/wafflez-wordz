@@ -95,6 +95,33 @@ enum AX {
         return rect
     }
 
+    /// Screen rects for a range, one per visual line, so wrapped text gets separate underlines.
+    static func lineRects(for range: NSRange, in el: AXUIElement, text: String) -> [CGRect] {
+        guard let whole = bounds(for: range, in: el) else { return [] }
+        guard let first = bounds(for: NSRange(location: range.location, length: 1), in: el),
+              first.height > 0, whole.height > first.height * 1.5 else { return [whole] }
+        // The range wraps: measure each word and merge the ones on the same line.
+        let ns = text as NSString
+        guard range.location + range.length <= ns.length else { return [whole] }
+        var rects: [CGRect] = []
+        var i = range.location
+        let end = range.location + range.length
+        while i < end {
+            while i < end, CharacterSet.whitespacesAndNewlines.contains(UnicodeScalar(ns.character(at: i)) ?? " ") { i += 1 }
+            var j = i
+            while j < end, !CharacterSet.whitespacesAndNewlines.contains(UnicodeScalar(ns.character(at: j)) ?? " ") { j += 1 }
+            if j > i, let r = bounds(for: NSRange(location: i, length: j - i), in: el) {
+                if let last = rects.last, abs(last.midY - r.midY) < first.height * 0.5 {
+                    rects[rects.count - 1] = last.union(r)
+                } else {
+                    rects.append(r)
+                }
+            }
+            i = j
+        }
+        return rects.isEmpty ? [whole] : rects
+    }
+
     // MARK: Writing
 
     @discardableResult

@@ -14,6 +14,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             EverywhereController.shared.start()
             AppDelegate.registerHotKeys()
             if args.contains("--everywhere-test") {
+                // Open a suggestion card, then the side panel, so CI screenshots show both.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 7.5) { EverywhereController.shared.openFirstCard() }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 11) {
+                    EverywhereController.shared.hideCard()
+                    EverywhereController.shared.sideTab.open(tab: .suggestions)
+                }
                 // CI check: report what Wafflez sees in the frontmost app.
                 for delay in [6.0, 8.0] {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {

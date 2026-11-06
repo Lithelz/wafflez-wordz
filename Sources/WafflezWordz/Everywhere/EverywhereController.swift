@@ -211,11 +211,12 @@ final class EverywhereController: ObservableObject {
             // Long ranges (whole sentences) are marked under their first few words.
             var r = s.range
             if r.length > 40 { r.length = min(r.length, 24) }
-            guard let b = AX.bounds(for: r, in: el) else { continue }
-            let rect = AX.toCocoa(b)
-            // Skip text scrolled out of view or wrapped across several lines.
-            guard area.insetBy(dx: -2, dy: -2).contains(CGPoint(x: rect.midX, y: rect.midY)), rect.height < 80 else { continue }
-            newMarks.append((suggestion: s, rect: rect))
+            for b in AX.lineRects(for: r, in: el, text: lastText) {
+                let rect = AX.toCocoa(b)
+                // Skip text scrolled out of view.
+                guard area.insetBy(dx: -2, dy: -2).contains(CGPoint(x: rect.midX, y: rect.midY)), rect.height < 80 else { continue }
+                newMarks.append((suggestion: s, rect: rect))
+            }
         }
         marks = newMarks
         overlay.show(marks.map {
